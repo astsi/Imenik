@@ -63,7 +63,14 @@ namespace Backend.Controllers
         [HttpDelete]
         public async Task ObrisiKontakt(int id)
         {
-            var kontakt = await Context.Kontakti.FindAsync(id);
+            var kontakt = Context.Kontakti.Include(c => c.listaTelefona).Where(c => c.id == id).FirstOrDefault();
+
+            var i = kontakt.listaTelefona.Select(t => t.id).ToList();
+            foreach(int el in i)
+            {
+                await ObrisiTelefon(el);
+            }
+
             Context.Remove(kontakt);
             await Context.SaveChangesAsync();
         }

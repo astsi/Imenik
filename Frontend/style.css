@@ -1,0 +1,53 @@
+
+
+  body {
+    font-family: Arial;
+    margin: 0;
+  }
+  .header {
+    padding: 60px;
+    text-align: center;
+    background: #1abc9c;
+    color: white;
+  }
+
+  .kontejner {  
+    display: flex;
+    flex-direction: row;
+  }
+  .side {
+    display: flex;
+    flex-direction: column;
+    flex: 20%;
+    background-color: #f1f1f1;
+    padding: 20px;
+
+  }
+  .main {
+    flex: 70%;
+    background-color: white;
+    padding: 20px;
+  }
+
+  .meniDodaj{
+      display: flex;
+      flex-direction: column;
+  }
+
+  .meni, .meniU, .meniD {
+    display: flex;
+    width: 30%;
+    flex-direction: column;
+    size: 80%;
+  }
+
+  .btnPlus{
+      width: min-content;
+  }
+  .forma{
+      display: flex;
+      flex-direction: column;
+  }
+
+  
+
