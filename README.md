@@ -17,8 +17,6 @@ Na glavnoj formi moguće su sledeće akcije:
 
 -Izbriši: briše selektovani zapis kontakta,
 
--Snimi: snima tabelu sa pronađenim kontaktima/telefonima u csv fajl (comma separated)
+-Snimi: snima tabelu sa pronađenim kontaktima/telefonima u csv fajl (comma separated).
 
- ## Frontend: HTTP, CSS, JS, Bootsrap Framework
- ## Backend: DOTNET.Core, Entity Framework
  
