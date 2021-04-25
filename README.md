@@ -19,6 +19,6 @@ Na glavnoj formi moguće su sledeće akcije:
 
 -Snimi: snima tabelu sa pronađenim kontaktima/telefonima u csv fajl (comma separated)
 
- # Frontend: HTTP, CSS, JS, Bootsrap Framework
- # Backend: DOTNET.Core, Entity Framework
+ ## Frontend: HTTP, CSS, JS, Bootsrap Framework
+ ## Backend: DOTNET.Core, Entity Framework
  
