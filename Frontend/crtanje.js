@@ -366,9 +366,7 @@ export class Crtanje{
                 el.value = prazanJe(el.value);
                 this.dodajBroj(kId,el.key,el.value);
             }
-            else{
-                alert("Broj telefona: " + el.key + " već postoji u bazi i neće biti dodat.");
-            }
+            
         });
     }
 
@@ -685,7 +683,7 @@ export class Crtanje{
         let strana = document.querySelector(".main");
         let meni = strana.querySelector(".meni");   
 
-        //meni.removeChild(meni.querySelector(".btnPlus"));
+        meni.removeChild(meni.querySelector(".btnPlus"));
         meni.querySelector(".iIme").value = kontakt.ime;
         meni.querySelector(".iPrezime").value = kontakt.prezime;
         //meni.querySelector(".iTipU").value = kontakt.tip;
@@ -696,18 +694,18 @@ export class Crtanje{
         let btnIzmeni = kreirajEl("iBtnIzmeni btn-secondary btn-sm","button","Izmeni kontakt", meni);
         btnIzmeni.onclick = ev => {
 
-            let broj = meni.querySelectorAll(".iBroj");
-            let tipB = meni.querySelectorAll(".iTipB");
+            let broj = meni.querySelector(".iBroj").value;
+            let tipB = meni.querySelector(".iTipB").value;
 
             let ime = meni.querySelector(".iIme").value;
             let prezime = meni.querySelector(".iPrezime").value;
             let tip = meni.querySelector(".iTipU").value;
             let opis = meni.querySelector(".iOpis").value;
 
-            if (opis.length > 0)
-            {
-                opis.trim();
-            }
+            // if (opis.length > 0)
+            // {
+            //     opis.trim();
+            // }
 
             if (ime === kontakt.ime && prezime === kontakt.prezime && tip === kontakt.tip && opis === kontakt.opis){
                 if (telefon.broj === broj && telefon.tip === tipB){
