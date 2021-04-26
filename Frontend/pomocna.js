@@ -19,6 +19,14 @@ export function nadjiKontakt(lista, ime, prezime, tip, opis){
     return lista.findIndex(i => i.ime === ime && i.prezime === prezime && i.tip === tip && i.opis === opis);
 }
 
+//ukoliko je sadrzaj (text) prazan, zamenjuje se placeholderom *
+export function prazanJe(text){
+    console.log("text:" + text);
+    if (text === "" || text === " ")
+        return "*";
+    else return text;
+}
+
 export function ukloniIzliste(id, lista){
 
     let ind = lista.findIndex(i => i.id ===  telefon.id);
