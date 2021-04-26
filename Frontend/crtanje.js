@@ -1,4 +1,4 @@
-import {kreirajEl, nadjiKontakt, pocinje, prazanJe, ukloniIzliste} from "./pomocna.js";
+import {kreirajEl, kreirajInput, nadjiKontakt, pocinje, prazanJe, ukloniIzliste} from "./pomocna.js";
 import {Kontakt} from "./kontakt.js";
 import {Telefon} from "./telefon.js";
 export class Crtanje{
@@ -243,6 +243,32 @@ export class Crtanje{
 
 //#region Pomocne Funkcije
 
+    updateujTipove(){
+
+        //podaci za tip kontakta
+        let dl = document.querySelector(".dlT");
+        console.log("Dl: " + dl);
+        let lista = this.nizZaTipK();
+        console.log(lista);
+        let option = "";
+        for (let i = 0; i<lista.length; i++){
+            option += "<option value='" + lista[i] + "' />";
+        }
+        console.log(option);
+        console.log(dl);
+        dl.innerHTML = option;
+
+        //podaci za tip broja
+        dl = document.querySelector(".dlTB");
+        console.log(dl);
+        lista = this.nizZaTipB();
+        option = "";
+        for (let i = 0; i<lista.length; i++){
+            option += "<option value='" + lista[i] + "' />";
+        }
+        dl.innerHTML = option;
+    }
+
     kreirajStavku(klasa, tipElementa, placeholder, tip, host){
             
         let el = kreirajEl(klasa, tipElementa,"",host);
@@ -267,10 +293,23 @@ export class Crtanje{
         return niz;
     }
 
+    nizZaTipB(){
+        let niz = [];
+        this.listaKontakata.forEach(k => {
+            k.listaTelefona.forEach(t => {
+                if (niz.findIndex(i => i === t.tip) === -1)
+                niz.push(t.tip);
+            });
+        });
+        console.log(niz);
+        return niz;
+    }
+
     nizZaTipK(){
 
         let niz = [];
         this.listaKontakata.forEach(el => {
+            if (niz.findIndex(i => i === el.tip) === -1)
             niz.push(el.tip);
         })
         return niz;
@@ -348,19 +387,9 @@ export class Crtanje{
         let dodajK = kreirajEl("dodajK btn btn-link","button","Dodaj kontakt",side);
         dodajK.onclick = ev => {
 
+            this.updateujTipove();
+
             let meni = document.querySelector(".meniD");
-            let select = document.querySelector(".iTip");
-
-            while (select.firstChild) {
-            select.removeChild(select.lastChild);
-            }
-
-            let opcije = this.nizZaTipK();
-
-            opcije.forEach(opcija =>{
-                kreirajEl("opcijaBr","option",opcija,select);
-            })
-
             if (meni.style.display == "none")
                 meni.style.display = "";
             else
@@ -389,9 +418,7 @@ export class Crtanje{
                 meni.style.display = "none";
             }
         }
-
         this.meniDodajBroj(side);
-
     }
 
     crtajTabelu(host){
@@ -408,7 +435,6 @@ export class Crtanje{
         th = kreirajEl("th","th","Opis",thead);
         th = kreirajEl("th","th","Izmeni podatak",thead);
         this.Tbodycontainer = kreirajEl("tbody","tbody","",table);
-
 
     }
 
@@ -428,14 +454,15 @@ export class Crtanje{
         let btnUredi = kreirajEl("btnUredi btn-secondary btn-sm","button","Uredi",td);
         btnUredi.onclick = ev => {
 
+            this.updateujTipove();
+
             let strana = document.querySelector(".main");
             let meni = strana.querySelector(".meni");
             if (meni != null)
             {
                 strana.removeChild(meni);
             }
-            console.log(strana);
-            console.log(meni);
+
             this.meniUredi(kontakt,telefon,this.container);
         }
         let btnObrisi = kreirajEl("btnObrisi btn-secondary btn-sm","button","Obrisi",td);
@@ -453,18 +480,33 @@ export class Crtanje{
         let tbody = kreirajEl("","tbody","", tabela);
         let tr = kreirajEl("tr","tr","", tbody);
         let td = kreirajEl("","td","", tr);
-        let broj = this.kreirajStavku("iBroj","input","npr. 018111222", "number", td);
+        let broj = kreirajInput("iBroj","npr. 018111222", td);
+        broj.type = "number";
         td = kreirajEl("","td","", tr);
-        let tipB = this.kreirajStavku("iTipB","input","npr. fiksni", "text", td);
+        
+        let formaTB = kreirajEl("formaTB","form","",td);
+        let tipB = kreirajInput("iTipB","npr. fiksni", formaTB);
+        let dl = kreirajEl("dlTB","datalist","",formaTB);
+        dl.id ="dl1";
+        tipB.setAttribute('list','dl1');
+
+
         let btnDodajRed = kreirajEl("btnPlus btn-secondary btn-sm","button","+", meni);
         btnDodajRed.onclick = ev => {
             if(broj.value != ""){
 
                 let tr = kreirajEl("tr","tr","", tbody);
                 let td = kreirajEl("","td","", tr);
-                broj = this.kreirajStavku("iBroj","input","npr. 060111222", "number", td);
+                broj = kreirajInput("iBroj","npr. 060111222", td);
+                broj.type = "number";
                 td = kreirajEl("","td","", tr);
-                tipB = this.kreirajStavku("iTipB","input","npr. mobilni", "text", td);
+                formaTB = kreirajEl("formaTB","form","",td);
+                tipB = kreirajInput("iTipB","npr. mobilni", formaTB);
+                dl = kreirajEl("dlTB","datalist","",formaTB);
+                dl.id ="dl1";
+                tipB.setAttribute('list','dl1');
+
+                //dodaj listu 
             }
             else{
                 alert("Niste uneli broj telefona.");
@@ -478,52 +520,55 @@ export class Crtanje{
         let forma = kreirajEl("forma","div","",host);
         
         kreirajEl("labela","label","po imenu:", forma);
-        let ime = this.kreirajStavku("pIme","input","Ime kontakta","text",forma);
+        let ime = kreirajInput("pIme","Ime kontakta",forma);
         ime.onkeyup = ev => this.pretraziIP("Ime");
         
         kreirajEl("labela","label","po prezimenu:", forma);
-        let prezime = this.kreirajStavku("pPrezime","input","Prezime kontakta","text",forma);
+        let prezime = kreirajInput("pPrezime","Prezime kontakta",forma);
         prezime.onkeyup = ev => this.pretraziIP("Prezime");
         
         kreirajEl("labela","label","po tipu kontakta:", forma);
         let tip = kreirajEl("pTip", "input","Tip kontakta",forma);
-        tip.type = "text";
+        let dl = kreirajEl("dlT","datalist","",forma);
+        dl.id ="dl2";
+        tip.setAttribute('list','dl2');
         tip.placeholder = "Tip kontakta";
         tip.onkeyup = ev => this.pretraziIP("Tip");
+        tip.onclick = ev => this.updateujTipove();
 
         kreirajEl("labela","label","po broju telefona:", forma);
-        let broj = this.kreirajStavku("pBroj","input","Broj kontakta","number",forma);
+        let broj = kreirajInput("pBroj","Broj kontakta",forma);
+        broj.type = "number";
         broj.onkeyup = ev => this.pretraziIP("Broj");
         
         kreirajEl("labela","label","po tipu broja:", forma);
-        let tipB = this.kreirajStavku("pTipB","input","Tip broja","text",forma);
+        let tipB = kreirajInput("pTipB","Tip broja",forma);
+        dl = kreirajEl("dlTB","datalist","",forma);
+        dl.id ="dl1";
+        tipB.setAttribute('list','dl1');
         tipB.onkeyup = ev => this.pretraziIP("TipB");
+        tipB.onclick = ev => this.updateujTipove();
     }
 
-    crtajMeni(host, dodaj){
+    crtajMeni(host){
         
         let meni = kreirajEl("meni","div","",host);
 
-        kreirajEl("b","b","Ime",meni);
-        let ime = this.kreirajStavku("iIme","input","npr. Pera", "text", meni);
-        kreirajEl("b","b","Prezime",meni);
-        let prezime = this.kreirajStavku("iPrezime","input","npr. Perić", "text", meni);
-        kreirajEl("b","b","Tip",meni);
+        kreirajEl("p","p","Ime",meni);
+        kreirajInput("iIme","npr. Pera", meni);
+        kreirajEl("p","p","Prezime",meni);
+        kreirajInput("iPrezime","npr. Perić", meni);
+        kreirajEl("p","p","Tip",meni);
+        let formaT = kreirajEl("formaT","form","",meni); 
 
-        let tip; 
-
-        if (dodaj){
-            tip = kreirajEl("iTip","select","",meni);
-        }
-        else{
-            tip = kreirajEl("iTip","input","",meni);
-        }
-        let opt = kreirajEl("opt","option","npr. posao",tip);
-        opt.selected = "disabled";
+        let tipU = kreirajInput("iTipU","npr. porodica",formaT);
+        let dl = kreirajEl("dlT","datalist","",formaT);
+        dl.id ="dl2";
+        tipU.setAttribute('list','dl2');
+        
 
         this.crtajTabeluBrojeva(meni);
-
-        kreirajEl("b","b","Opis kontakta",meni);
+        kreirajEl("p","p","Opis kontakta",meni);
         let opis = kreirajEl("iOpis","textArea","npr. Pera sa IT obuke", meni);
         opis.placeholder = "npr. Pera sa IT obuke";
 
@@ -535,47 +580,48 @@ export class Crtanje{
 
     meniDodaj(host){
 
-        this.crtajMeni(host, 1);
+        this.crtajMeni(host);
         let meni = document.querySelector(".meni");
         meni.style.display = "none";
         meni.className = "meniD";
 
         let btnDodaj = kreirajEl("iBtnDodaj btn-secondary btn-sm","button","Dodaj kontakt", meni);
         btnDodaj.onclick = ev => {
+            console.log("kliknuto");
+            this.updateujTipove();
 
-            let ime = meni.querySelector(".iIme").value;
-            let listaBr = meni.querySelectorAll(".iBroj");
+        let ime = meni.querySelector(".iIme").value;
+        let listaBr = meni.querySelectorAll(".iBroj");
 
-            if (ime === "" || ime === " " || listaBr.length < 1){
-                alert("Obavezan je unos imena i jednog broja!");
+        if (ime === "" || ime === " " || listaBr.length < 1){
+            alert("Obavezan je unos imena i jednog broja!");
+        }
+        else {
+            let prezime = meni.querySelector(".iPrezime").value;
+            let opis = meni.querySelector(".iOpis").value;
+            let tip = meni.querySelector(".iTipU").value;
+            
+            for (let i = 0; i< listaBr.length; i++){
+                if (listaBr[i].value.length < 6 || listaTB[i].value.length > 15){
+                    alert("Nevalidno unet broj " + listaBr[i].value + " neće biti sačuvan.");
+                }
+                else {
+                    this.parBrTip.push({
+                    key: listaBr[i].value,
+                    value: prazanJe(listaTB[i].value)
+                    });
+                }
             }
-            else {
-                let prezime = meni.querySelector(".iPrezime").value;
-                let opis = meni.querySelector(".iOpis").value;
-                let tip = meni.querySelector(".iTip").value;
-                let listaTB = meni.querySelectorAll(".iTipB");
-                
-                for (let i = 0; i< listaBr.length; i++){
-                    if (listaBr[i].value.length < 6 || listaTB[i].value.length > 15){
-                        alert("Nevalidno unet broj " + listaBr[i].value + " neće biti sačuvan.");
-                    }
-                    else {
-                        this.parBrTip.push({
-                        key: listaBr[i].value,
-                        value: prazanJe(listaTB[i].value)
-                        });
-                    }
-                }
-                prezime = prazanJe(prezime);
-                tip = prazanJe(tip);
-                opis = prazanJe(opis);
+            prezime = prazanJe(prezime);
+            tip = prazanJe(tip);
+            opis = prazanJe(opis);
 
-                if (this.listaKontakata.findIndex(k => k.ime === ime && k.prezime === prezime && k.tip === tip && k.opis === opis) === -1){
-                    this.dodajKontakt(ime,prezime,tip,opis);
-                }
-                else{
-                    alert("Kontakt sa ovim podacima već postoji u bazi. Pokusajte ponovo ili dodajte broj postojecem kontaktu. ");
-                }
+            if (this.listaKontakata.findIndex(k => k.ime === ime && k.prezime === prezime && k.tip === tip && k.opis === opis) === -1){
+                this.dodajKontakt(ime,prezime,tip,opis);
+            }
+            else{
+                alert("Kontakt sa ovim podacima već postoji u bazi. Pokusajte ponovo ili dodajte broj postojecem kontaktu. ");
+            }
             }
         }
     }
@@ -633,27 +679,34 @@ export class Crtanje{
 
     meniUredi(kontakt,telefon, host){
         
-        this.crtajMeni(host, 0);
+        this.crtajMeni(host);
+        
         let strana = document.querySelector(".main");
-        let meni = strana.querySelector(".meni");
+        let meni = strana.querySelector(".meni");   
 
-        meni.removeChild(meni.querySelector(".btnPlus"));
+        //meni.removeChild(meni.querySelector(".btnPlus"));
         meni.querySelector(".iIme").value = kontakt.ime;
         meni.querySelector(".iPrezime").value = kontakt.prezime;
-        meni.querySelector(".iTip").value = kontakt.tip;
+        //meni.querySelector(".iTipU").value = kontakt.tip;
         meni.querySelector(".iOpis").value = kontakt.opis;
         meni.querySelector(".iBroj").value = telefon.broj;
-        meni.querySelector(".iTipB").value = telefon.tip;
+        //meni.querySelector(".iTipB").value = telefon.tip;
 
         let btnIzmeni = kreirajEl("iBtnIzmeni btn-secondary btn-sm","button","Izmeni kontakt", meni);
         btnIzmeni.onclick = ev => {
-            let broj = meni.querySelector(".iBroj").value;
-            let tipB = meni.querySelector(".iTipB").value;
+
+            let broj = meni.querySelectorAll(".iBroj");
+            let tipB = meni.querySelectorAll(".iTipB");
 
             let ime = meni.querySelector(".iIme").value;
             let prezime = meni.querySelector(".iPrezime").value;
-            let tip = meni.querySelector(".iTip").value;
+            let tip = meni.querySelector(".iTipU").value;
             let opis = meni.querySelector(".iOpis").value;
+
+            if (opis.length > 0)
+            {
+                opis.trim();
+            }
 
             if (ime === kontakt.ime && prezime === kontakt.prezime && tip === kontakt.tip && opis === kontakt.opis){
                 if (telefon.broj === broj && telefon.tip === tipB){

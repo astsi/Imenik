@@ -7,6 +7,16 @@ export function kreirajEl(className, type, text, host){
     return el;
 }
 
+export function kreirajInput(className, placeholder,host){
+    let el = document.createElement("input");
+    el.className = className;
+    el.placeholder = placeholder;
+    el.value = "";
+    host.appendChild(el);
+
+    return el;
+}
+
 export function uListi(telefon, lista){
     let ind = lista.findIndex(i => i.broj === telefon.broj);
     if (ind > -1)
