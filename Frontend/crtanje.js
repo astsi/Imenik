@@ -1,4 +1,4 @@
-import {kreirajEl, pocinje, ukloniIzliste} from "./pomocna.js";
+import {kreirajEl, nadjiKontakt, pocinje, ukloniIzliste} from "./pomocna.js";
 import {Kontakt} from "./kontakt.js";
 import {Telefon} from "./telefon.js";
 export class Crtanje{
@@ -6,9 +6,10 @@ export class Crtanje{
     constructor(host){
         
         this.listaKontakata = [];
-
         this.listaPretrage = [];
         this.parBrTip = [];
+
+        this.opcijeBr = [];
         this.count = 0;
 
         this.container = host;
@@ -67,7 +68,7 @@ export class Crtanje{
     crtajTabelu(host){
 
         //let host = document.querySelector(".main");
-
+        this.preuzmiKontakte();
         let table = kreirajEl("tabela table table-hoover", "table", "",host);
         let thead = kreirajEl("theader", "thead","",table);
         let th = kreirajEl("th","th","#",thead);
@@ -79,18 +80,125 @@ export class Crtanje{
         th = kreirajEl("th","th","Opis",thead);
         th = kreirajEl("th","th","Izmeni podatak",thead);
         this.Tbodycontainer = kreirajEl("tbody","tbody","",table);
-        this.preuzmiKontakte();
+
 
     }
     crtajGlavnu(){
-        this.crtajTabelu(this.container);
 
-        let side = document.querySelector(".side");
-
-        this.crtajPretragu(side);
-        this.meniDodaj(side);
         let btnSnimi = kreirajEl("btnSnimi  btn-secondary btn-sm","button","Snimi u .csv formatu",this.container);
         btnSnimi.onclick = ev => this.snimiUFajl();
+        this.crtajTabelu(this.container);
+        let side = document.querySelector(".side");
+        this.crtajPretragu(side);
+
+        let dodajK = kreirajEl("dodajK btn btn-link","button","Dodaj kontakt",side);
+        dodajK.onclick = ev => {
+            let meni = document.querySelector(".meniD");
+            if (meni.style.display == "none")
+                meni.style.display = "";
+            else
+                meni.style.display = "none";
+        }
+        this.meniDodaj(side);
+
+        let dodajB = kreirajEl("dodajB btn btn-link","button","Dodaj broj postojećem kontaktu",side);
+        dodajB.onclick = ev => {
+
+            let meni = document.querySelector(".meniBroj");
+            let select = meni.querySelector(".sKontakt");
+            let opcije = this.nizZaBr();
+
+            opcije.forEach(opcija =>{
+                console.log(opcija);
+                kreirajEl("opcijaBr","option",opcija,select);
+            })
+
+            if (meni.style.display == "none")
+                meni.style.display = "";
+            else
+                meni.style.display = "none";
+            
+        }
+
+        this.meniDodajBroj(side);
+
+
+    }
+
+    meniDodajBroj(host){
+
+        let id = -1;
+
+        let meni = kreirajEl("meniBroj","div","",host);
+        meni.style.display = "none";
+
+        kreirajEl("label","p","Izaberi kontakt:",meni);
+
+        let sKontakt = this.kreirajStavku("sKontakt","select","","text",meni);
+        let opt = kreirajEl("opt","option","Lista kontakata iz baze",sKontakt);
+        opt.selected = "disabled";
+
+        sKontakt.onclick = ev =>{
+
+            if (sKontakt.value != "Lista kontakata iz baze")
+            {
+                let reci = sKontakt.value.replaceAll(",","").split(" ");
+                let kOpis = sKontakt.value.replace(/^([^ ]+ ){3}/, '');
+                let ind = nadjiKontakt(this.listaKontakata,reci[0],reci[1],reci[2],kOpis);
+    
+                id = this.listaKontakata[ind].id;
+            }
+
+
+
+        }
+        kreirajEl("label","p","Unesi broj:",meni);
+        this.crtajTabeluBrojeva(meni);
+
+        let btnDodaj = kreirajEl("iBtnDodaj btn-secondary btn-sm","button","Dodaj kontakt", meni);
+        btnDodaj.onclick = ev => {
+
+            if (sKontakt.value != "Lista kontakata iz baze"){
+
+                let listaBr = meni.querySelectorAll(".iBroj");
+            let listaTB = meni.querySelectorAll(".iTipB");
+
+            for (let i = 0; i< listaBr.length; i++)
+            {
+                this.parBrTip.push({
+                    key: listaBr[i].value,
+                    value: listaTB[i].value
+                });
+            }
+
+            console.log("!!!!" + sKontakt.value);
+
+            console.log(id);
+            this.dodajBrojeve(id);
+            }
+
+            else{
+                alert("Nije odabran kontakt iz liste.");
+            }
+
+            
+        }
+
+
+        
+
+        
+    }
+
+    nizZaBr(){
+        let niz = [];
+        this.listaKontakata.forEach(el => {
+            let opcija = el.ime + " " + el.prezime + ", " + el.tip + ", " + el.opis;
+            niz.push(opcija);
+        })
+        console.log(niz);
+
+        return niz;
     }
 
     snimiUFajl(){
@@ -288,6 +396,7 @@ export class Crtanje{
                     telefon.id = q;
                     
                     let indK = this.listaKontakata.findIndex(i => i.id ===  kId);
+                    console.log(this.listaKontakata[indK]);
                     this.listaKontakata[indK].listaTelefona.push(telefon);
 
                     this.ucrtajTelefon(this.listaKontakata[indK],telefon);
@@ -375,6 +484,16 @@ export class Crtanje{
         kreirajEl("b","b","Tip",meni);
         let tip = this.kreirajStavku("iTip","input","npr. posao", "text", meni);
 
+        this.crtajTabeluBrojeva(meni);
+
+        kreirajEl("b","b","Opis kontakta",meni);
+        let opis = this.kreirajStavku("iOpis","textArea","npr. Pera sa IT obuke", "text", meni);
+
+        //return [ime.value,prezime.value,tip.value,opis.value];
+    }
+
+    crtajTabeluBrojeva(meni){
+
         let tabela = kreirajEl("iTabela table table-hoover","table","", meni);
         let thead = kreirajEl("theader", "thead","",tabela);
         let th = kreirajEl("th","th","Broj telefona",thead);
@@ -400,19 +519,15 @@ export class Crtanje{
                 alert("Niste uneli broj telefona.");
 
         }
-
-        kreirajEl("b","b","Opis kontakta",meni);
-        let opis = this.kreirajStavku("iOpis","textArea","npr. Pera sa IT obuke", "text", meni);
-
-        //return [ime.value,prezime.value,tip.value,opis.value];
     }
 
     meniDodaj(host){
 
-        kreirajEl("hDodaj","h4","Dodaj kontakt",host);
+       // kreirajEl("hDodaj","h4","Dodaj kontakt",host);
 
         this.crtajMeni(host);
         let meni = document.querySelector(".meni");
+        meni.style.display = "none";
         meni.className = "meniD";
 
         let btnDodaj = kreirajEl("iBtnDodaj btn-secondary btn-sm","button","Dodaj kontakt", meni);
@@ -449,6 +564,7 @@ export class Crtanje{
         this.crtajMeni(host);
         let meni = document.querySelector(".meni");
         meni.className = "meniU";
+        meni.removeChild(meni.querySelector(".btnPlus"));
         meni.querySelector(".iIme").value = kontakt.ime;
         meni.querySelector(".iPrezime").value = kontakt.prezime;
         meni.querySelector(".iTip").value = kontakt.tip;
