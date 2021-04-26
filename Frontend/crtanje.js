@@ -721,7 +721,10 @@ export class Crtanje{
                     console.log("obrisi broj");
                     tbody.removeChild(tr);
                     let ind = this.listaKontakata.findIndex(i=> i.id === kId);
-                    ukloniIzliste(brId, this.listaKontakata[ind]);
+                    let indTel = this.listaKontakata[ind].listaTelefona.findIndex(i => i.id ===brId);
+                    let Tel = this.listaKontakata[ind].listaTelefona[indTel];
+                    console.log(Tel);
+                    ukloniIzliste(Tel, this.listaKontakata[ind]);
                 }
                 else {
                     alert("Error - another type of error.");
