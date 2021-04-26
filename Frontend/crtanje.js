@@ -234,7 +234,7 @@ export class Crtanje{
                 tbody.removeChild(tr);
             }
             else {
-                alert("Error - another type of error.");
+                alert("Greska na Backend - u.");
             }
         });
     }
@@ -247,20 +247,15 @@ export class Crtanje{
 
         //podaci za tip kontakta
         let dl = document.querySelector(".dlT");
-        console.log("Dl: " + dl);
         let lista = this.nizZaTipK();
-        console.log(lista);
         let option = "";
         for (let i = 0; i<lista.length; i++){
             option += "<option value='" + lista[i] + "' />";
         }
-        console.log(option);
-        console.log(dl);
         dl.innerHTML = option;
 
         //podaci za tip broja
         dl = document.querySelector(".dlTB");
-        console.log(dl);
         lista = this.nizZaTipB();
         option = "";
         for (let i = 0; i<lista.length; i++){
@@ -301,7 +296,6 @@ export class Crtanje{
                 niz.push(t.tip);
             });
         });
-        console.log(niz);
         return niz;
     }
 
@@ -585,7 +579,6 @@ export class Crtanje{
 
         let btnDodaj = kreirajEl("iBtnDodaj btn-secondary btn-sm","button","Dodaj kontakt", meni);
         btnDodaj.onclick = ev => {
-            console.log("kliknuto");
             this.updateujTipove();
 
         let ime = meni.querySelector(".iIme").value;
@@ -702,24 +695,43 @@ export class Crtanje{
             let tip = meni.querySelector(".iTipU").value;
             let opis = meni.querySelector(".iOpis").value;
 
-            // if (opis.length > 0)
-            // {
-            //     opis.trim();
-            // }
+            let listaBr = [];
+            this.listaKontakata.forEach(el => {
+                el.listaTelefona.forEach(tel =>{
+                    listaBr.push(tel.broj);
+                });
+            });
 
-            if (ime === kontakt.ime && prezime === kontakt.prezime && tip === kontakt.tip && opis === kontakt.opis){
-                if (telefon.broj === broj && telefon.tip === tipB){
-                    alert("Nema promena");
+            if (opis.length > 0)
+            {
+                opis.trim();
+            }
+
+            //provera tipa ako postoji kontakt sa tim tipom i to nije trenutni kontakt onda greska Unesite drugo ime tipa
+            console.log(listaBr);
+            console.log(broj);
+           
+                if (ime === kontakt.ime && prezime === kontakt.prezime && tip === kontakt.tip && opis === kontakt.opis){
+                    if (telefon.broj === broj && telefon.tip === tipB){
+                        alert("Nema promena");
+                    }
+                    else{
+                        if (listaBr.findIndex(i => i === broj) === -1 || kontakt.listaTelefona.findIndex(i => i.broj === broj) != -1){
+                        this.izmeniBrojeve(telefon, broj, tipB);
+                        }
+                        else{
+                            alert("Uneseni broj se vec nalazi u bazi.")
+                        }
+                    }
                 }
                 else{
-                    this.izmeniBrojeve(telefon, broj, tipB);
+                    this.izmeniKontakt(kontakt.id, ime, prezime, tip, opis);
                 }
+                this.container.removeChild(meni);
             }
-            else{
-                this.izmeniKontakt(kontakt.id, ime, prezime, tip, opis);
-            }
-            this.container.removeChild(meni);
-        }
+            
+
+           
     }
 
     meniObrisi(kontakt, brId,tbody,tr){
