@@ -21,7 +21,6 @@ export function nadjiKontakt(lista, ime, prezime, tip, opis){
 
 //ukoliko je sadrzaj (text) prazan, zamenjuje se placeholderom *
 export function prazanJe(text){
-    console.log("text:" + text);
     if (text === "" || text === " ")
         return "*";
     else return text;
