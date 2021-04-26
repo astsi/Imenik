@@ -592,6 +592,7 @@ export class Crtanje{
 
         let ime = meni.querySelector(".iIme").value;
         let listaBr = meni.querySelectorAll(".iBroj");
+        let listaTB = meni.querySelectorAll(".iTipB");
 
         if (ime === "" || ime === " " || listaBr.length < 1){
             alert("Obavezan je unos imena i jednog broja!");
@@ -602,7 +603,7 @@ export class Crtanje{
             let tip = meni.querySelector(".iTipU").value;
             
             for (let i = 0; i< listaBr.length; i++){
-                if (listaBr[i].value.length < 6 || listaTB[i].value.length > 15){
+                if (listaBr[i].value.length < 6 || listaBr[i].value.length > 15){
                     alert("Nevalidno unet broj " + listaBr[i].value + " neće biti sačuvan.");
                 }
                 else {
